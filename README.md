@@ -52,25 +52,6 @@ The skill is manual-only (`disable-model-invocation`), so it never runs unless y
 - `init.sh`  the mechanical copier the skill calls. Never overwrites. You can also run it by hand: `bash init.sh /path/to/project`
 - `template/`  the files a project gets
 
-## Maintainer
-
-This repo is published from a private development repo as snapshot commits. Each one holds only the files above. Changes are made upstream and arrive with the next snapshot.
-
-Publishing, from the private repo:
-
-```bash
-just publish                 # builds the tree, leak-checks it, commits a snapshot on local branch public
-git push relay-public        # pushes public -> main with the repo's deploy key
-```
-
-One-time setup for the push: a write-enabled deploy key scoped to this repo only (no account-wide token), and a remote whose only push refspec is `public:main`, so a bare push can never send the private branches:
-
-```bash
-git remote add relay-public git@github.com:sperovita/relay.git
-git config remote.relay-public.push refs/heads/public:refs/heads/main
-git config core.sshCommand "ssh -i ~/.ssh/id_ed25519_relay -o IdentitiesOnly=yes"
-```
-
 ## Licence
 
 MIT, see `LICENSE`.
