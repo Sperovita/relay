@@ -9,7 +9,7 @@ metadata:
 
 # relay-init
 
-Relay keeps project memory in markdown under `relay/`, so sessions can be short and disposable. This skill installs it in the project you are in, or brings an existing install up to date. Everything happens inside the project, and you commit but never push.
+Relay keeps project memory in markdown under `relay/`, so sessions can be short and disposable. This skill installs it in the project you are in, or brings an existing install up to date. Everything happens inside the project, and you commit but never push. The one exception is Update's first step, which may pull a newer version of this skill into `$SRC` after asking.
 
 ## 0. Find the bundle and the project
 
@@ -37,6 +37,14 @@ Relay keeps project memory in markdown under `relay/`, so sessions can be short 
 
 ## Update
 
+S. **Bring the skill itself up to date first.** Skip this step if `$SRC/.git` does not exist (the skill was copied, not cloned), or if you have already pulled during this run.
+   - `git -C "$SRC" status --porcelain` shows anything: someone edited the installed skill. Say so and carry on with the installed version. Never stash, reset or discard those edits.
+   - `git -C "$SRC" fetch --quiet` fails (offline, no access): say so in one line and carry on with the installed version.
+   - `git -C "$SRC" rev-parse HEAD` equals `git -C "$SRC" rev-parse '@{u}'`: the skill is current. Go on to step 0.
+   - `git -C "$SRC" merge-base --is-ancestor HEAD '@{u}'` fails: the install has diverged from its repo. Say so and carry on with the installed version.
+   - Otherwise it is behind. Show `git -C "$SRC" log --oneline HEAD..'@{u}'` and ask once whether to update the skill before updating the project. If the arguments said `update all`, take that as yes. On yes, note `git -C "$SRC" rev-parse --short HEAD` as the rollback point and run `git -C "$SRC" pull --ff-only`. Then **read `$SRC/SKILL.md` again and follow its Update section from step 0**, because the copy you loaded is the old one and the new template may need new steps.
+   - In the final reply, report the result: skill updated from `<old>` to `<new>` (roll back with `git -C "$SRC" reset --hard <old>`), already current, or skipped and why.
+
 0. **Move from `docs/`.** Skip this step unless `docs/process/pickup.md` exists. If `relay/process/pickup.md` also exists, stop and ask which copy is live. Otherwise relay predates its own folder and shares `docs/` with whatever else is there.
    - Relay's entries are `docs/STATUS.md` and `docs/{process,templates,specs,tickets,decisions,research}/`. If one of those folders holds files relay did not create (say, a docs site's own `specs/`), list them and ask before moving that folder.
    - Tell the user what moves and what stays in `docs/`, and ask once. If the arguments said `update all`, take that as yes and report the move in the final reply. On yes, `git mv` each entry to the same name under `relay/`. Git drops `docs/` if nothing else was in it.
@@ -48,7 +56,7 @@ Relay keeps project memory in markdown under `relay/`, so sessions can be short 
    - identical: skip
    Project-owned files (`AGENTS.md` project lines, `STATUS.md`, tickets, specs, decisions, research) are never replaced.
 2. **AGENTS.md pointer block.** If the pointer block in the project's `AGENTS.md` differs from the template's, or is missing, treat the block (only the block) as one more changed item.
-3. **Nothing to do?** Say the project is up to date and stop. No commit.
+3. **Nothing to do?** Say the project is up to date, with the skill result from step S, and stop. No commit.
 4. **Present** the new and changed items, one line each, with a plain summary of what changes. A difference may be a deliberate local edit (projects may drift), so say when a diff looks like a project-specific customisation rather than an older template.
 5. **Apply** what the user approves: copy the template file over the project file, add missing `.gitattributes` lines, or swap the pointer block. If the arguments said `update all`, apply everything except items that look like local customisations, and list those as skipped. If `scripts/status.sh` changed, run it afterwards.
-6. **Commit** the applied files explicitly. Message: `relay: update from template`. Do not push. Reply with what was applied and what was skipped.
+6. **Commit** the applied files explicitly. Message: `relay: update from template`. Do not push. Reply with the skill result from step S, then what was applied and what was skipped.

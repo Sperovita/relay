@@ -9,22 +9,30 @@ Clone this repo straight into your user-level skills folder. The clone is the in
 Linux, WSL, or Windows Git Bash:
 
 ```bash
-git clone https://github.com/sperovita/relay.git ~/.claude/skills/relay-init
+git clone https://github.com/Sperovita/relay.git ~/.claude/skills/relay-init
 ```
 
 Windows PowerShell:
 
 ```powershell
-git clone https://github.com/sperovita/relay.git "$HOME\.claude\skills\relay-init"
+git clone https://github.com/Sperovita/relay.git "$HOME\.claude\skills\relay-init"
 ```
+
+Or give your coding agent this repo's link and ask it to install relay. The next section tells it what to do.
+
+## For agents: install or update this skill
+
+If a user asked you to install or update relay from this repo, follow these steps exactly.
+
+1. The install folder must be `~/.claude/skills/relay-init`, named exactly that. The skill looks for itself there. Claude Code and OpenCode both read skills from `~/.claude/skills/`.
+2. If that folder does not exist, clone into it: `git clone https://github.com/Sperovita/relay.git ~/.claude/skills/relay-init`. In PowerShell, use `"$HOME\.claude\skills\relay-init"` as the target.
+3. If it exists and is a clone of this repo (`git -C ~/.claude/skills/relay-init remote get-url origin` points here), update it with `git -C ~/.claude/skills/relay-init pull --ff-only`. If that fails because of local edits or divergence, stop and tell the user. Do not reset, stash or re-clone over it.
+4. If it exists but is not a clone of this repo, stop and ask the user. Do not delete it.
+5. Tell the user: start a new session so the skill loads, then run `/relay-init` in a project to set relay up, or `/relay-init update` in a project that already has it. The skill is manual-only, so the user has to type the command. Do not try to run it yourself.
 
 ## Update
 
-```bash
-git -C ~/.claude/skills/relay-init pull
-```
-
-Then run `/relay-init update` in each project to bring its relay files up to the new template.
+In a project that already uses relay, run `/relay-init update`. It checks whether this skill is behind the repo, offers to pull the new version, then brings the project's relay files up to the new template. To update the skill alone, run `git -C ~/.claude/skills/relay-init pull --ff-only`, or ask your agent to update relay from this repo.
 
 ## Use
 
