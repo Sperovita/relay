@@ -63,7 +63,7 @@ just publish                 # builds the tree, leak-checks it, commits a snapsh
 git push relay-public        # pushes public -> main with the repo's deploy key
 ```
 
-One-time setup for the push: a write-enabled deploy key scoped to this repo only, made with a `repokey` helper run from an empty directory, then a remote whose only push refspec is `public:main`:
+One-time setup for the push: a write-enabled deploy key scoped to this repo only (no account-wide token), and a remote whose only push refspec is `public:main`, so a bare push can never send the private branches:
 
 ```bash
 git remote add relay-public git@github.com:sperovita/relay.git
