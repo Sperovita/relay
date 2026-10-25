@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Rebuild relay/STATUS.md from the frontmatter of relay/tickets/*.md.
 # Lints the tickets first and refuses to write if one is broken: duplicate id, unknown status,
-# missing id, title or type. Keeps the hand-edited "Summary:" line. Safe to run any time.
+# missing id, title or type, filename not starting with the id. Keeps the hand-edited "Summary:" line. Safe to run any time.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -33,7 +33,8 @@ row() {
 
 tickets() { ls relay/tickets/*.md 2>/dev/null | sort || true; }
 
-# lint: every ticket has id, title, type and a known status; no id appears twice. Names the file, exits 1.
+# lint: every ticket has id, title, type and a known status; its filename starts with its id; no id
+# appears twice. Names the file, exits 1.
 lint() {
   local f k id st ok=true ids="" d
   for f in $(tickets); do
@@ -47,6 +48,12 @@ lint() {
     esac
     id=$(field "$f" id)
     [ -z "$id" ] || ids+="$id"$'\t'"$f"$'\n'
+    if [ -n "$id" ]; then
+      case "$(basename "$f")" in
+        "$id"-*) ;;
+        *) echo "status.sh: $f: filename does not start with its id '$id'" >&2; ok=false ;;
+      esac
+    fi
   done
   for d in $(printf '%s' "$ids" | cut -f1 | sort | uniq -d); do
     echo "status.sh: duplicate id $d in: $(printf '%s' "$ids" | awk -F'\t' -v d="$d" '$1 == d { print $2 }' | tr '\n' ' ')" >&2

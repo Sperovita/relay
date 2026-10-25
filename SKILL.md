@@ -28,12 +28,12 @@ Relay keeps project memory in markdown under `relay/`, so sessions can be short 
    - `.gitattributes` existed: append any lines from `$SRC/template/.gitattributes` that it lacks.
 4. **Fill the project lines** under `## Project specifics` in `AGENTS.md` (Run, Test, Gotchas). Read what the repo already says: justfile, Makefile, package.json scripts, pyproject.toml, Cargo.toml, go.mod, README, CI config. Use one short line each, with exact commands in backticks. Gotchas are things a fresh agent would get wrong, such as required env, generated files and test quirks. If something is unknown, write `(none found)` rather than guessing. If merged content already covers a line, point to it instead of repeating it. Keep the section short, because it loads into every session.
 5. **Seed the first piece of work.** Use the arguments as a description of what the user is working on. If there are none, ask "What are you working on in this project right now?" and wait. If the user has nothing, skip this step.
-   - Create `relay/tickets/0001-<verb-phrase>.md` from `relay/templates/ticket.md`: `status: ready`, a one-paragraph Goal, three to six Acceptance boxes, and Context pointers to the files involved. Leave the Handoff block empty.
+   - Mint an id with `bash scripts/new-id.sh` and create `relay/tickets/<id>-<verb-phrase>.md` from `relay/templates/ticket.md`: the id in `id:` and the heading, `status: ready`, a one-paragraph Goal, three to six Acceptance boxes, and Context pointers to the files involved. Leave the Handoff block empty.
    - If the work clearly spans several sessions, also create `relay/specs/<noun-phrase>.md` from `relay/templates/spec.md`, split the work into session-sized tickets, list them in the spec, and set `spec:` on each ticket.
    - Remove `.gitkeep` from any folder you put a file in.
 6. **Board.** Run `bash scripts/status.sh`. Set the `Summary:` line in `relay/STATUS.md` to one line describing where the project stands.
 7. **Commit.** Stage explicitly: the files `init.sh` added, the merged files, the ticket/spec files and any removed `.gitkeep`. Message: `relay: set up`. Do not push.
-8. **Reply** in a few lines: what was added, what was merged and where it went, the project lines you filled (and any marked `(none found)`), the seeded ticket, and how to start: open a new session and say `pick up 0001`. Do not claim or start the ticket.
+8. **Reply** in a few lines: what was added, what was merged and where it went, the project lines you filled (and any marked `(none found)`), the seeded ticket, and how to start: open a new session and say `pick up <id>` (the three-character suffix is enough). Do not claim or start the ticket.
 
 ## Update
 

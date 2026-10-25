@@ -1,5 +1,5 @@
 ---
-id: 0000
+id: YYYY-MM-DD-xxx
 title:
 spec:
 type: implement
@@ -7,7 +7,7 @@ status: ready
 blocked-by:
 branch:
 ---
-# 0000 Title
+# YYYY-MM-DD-xxx Title
 
 ## Goal
 One paragraph. What done looks like from the outside.
@@ -17,7 +17,7 @@ One paragraph. What done looks like from the outside.
 
 ## Context pointers
 - path/to/file.ext:NN  why it matters
-- relay/decisions/0000-...
+- relay/decisions/YYYY-MM-DD-xxx-...
 
 ## Notes
 Working notes during the session. Optional. Prune at wrap.

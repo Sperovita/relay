@@ -42,7 +42,7 @@ In a project (a git repo with a clean tree), start a session and run:
 /relay-init what you are working on right now
 ```
 
-It copies the relay files in, merges an existing `AGENTS.md` / `CLAUDE.md` / `.gitattributes` without dropping anything, fills in the project's run and test commands, seeds ticket 0001 from your description, and commits `relay: set up`. It never pushes. Then open a new session and say `pick up 0001`. Say `wrap it up` when you stop.
+It copies the relay files in, merges an existing `AGENTS.md` / `CLAUDE.md` / `.gitattributes` without dropping anything, fills in the project's run and test commands, seeds a first ticket from your description, and commits `relay: set up`. It never pushes. Then open a new session and say `pick up` plus the ticket's id or just its last three characters (`pick up k7q` for `2026-10-25-k7q`). Say `wrap it up` when you stop.
 
 `/relay-init update` compares the project's relay files with this bundle, shows what changed, and applies what you approve. `/relay-init update all` applies everything except files that look locally customised. An install from before relay moved to its own folder (relay files under `docs/`) is moved to `relay/` first.
 

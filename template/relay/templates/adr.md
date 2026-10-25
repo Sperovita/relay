@@ -1,4 +1,4 @@
-# NNNN Verb phrase
+# YYYY-MM-DD-xxx Verb phrase
 
 Date: YYYY-MM-DD
 Status: accepted

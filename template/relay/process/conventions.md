@@ -14,11 +14,15 @@ relay/
   process/         this folder
   templates/       copy these
 scripts/status.sh  lints ticket frontmatter, then rebuilds STATUS.md
+scripts/new-id.sh  prints a fresh ticket or decision id
 ```
 
 ## Naming
 
-- Tickets and decisions: `NNNN-verb-phrase.md`, four digits, lowercase, dashes. Next number is the highest existing plus one in that folder.
+- Tickets and decisions: `<id>-verb-phrase.md`, lowercase, dashes. Mint the id with `scripts/new-id.sh`: today's date plus three random characters, `2026-10-25-k7q`. Never count up from the highest existing number; two clones counting up mint the same one. If the script cannot run, use today's date plus three random lowercase letters or digits that no other ticket or decision uses as its suffix.
+- Older four-digit ids (`0007`) stay valid and are never renamed. They sort before dated ids, so the board stays in order.
+- The suffix alone names a ticket: `pickup k7q` means `relay/tickets/????-??-??-k7q-*.md`.
+- If `scripts/status.sh` reports a duplicate id after a merge or pull, the ticket created later gets a fresh id: `git mv` the file to the new name, update its `id:` and heading, update any `blocked-by:` or link that names the old id, note the old id in its Notes so `git log --grep` still finds the earlier commits, and rerun the script.
 - Specs: `noun-phrase.md`.
 - Paths inside documents are repo-relative with forward slashes. Never absolute. Never machine-specific.
 
