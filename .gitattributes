@@ -1,0 +1,2 @@
+# A clone is the install, and init.sh copies these files into projects: keep LF everywhere, even on Windows.
+* text=auto eol=lf
