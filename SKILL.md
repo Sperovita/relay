@@ -3,13 +3,11 @@ name: relay-init
 description: Set up relay (file-based session handoff) in the current project, or update an existing relay install from the bundled template. Run by hand only.
 disable-model-invocation: true
 argument-hint: "[what you are working on now | update]"
-metadata:
-  opencode/slash: "true"
 ---
 
 # relay-init
 
-Relay keeps project memory in markdown under `relay/`, so sessions can be short and disposable. This skill installs it in the project you are in, or brings an existing install up to date. Everything happens inside the project, and you commit but never push. The one exception is Update's first step, which may pull a newer version of this skill into `$SRC` after asking.
+Relay keeps project memory in markdown under `relay/`, so sessions can be short and disposable. This skill installs it in the project you are in, or brings an existing install up to date. Everything happens inside the project, and you commit but never push. The exceptions are in Update: step S may pull a newer version of this skill into `$SRC`, and step C may refresh this skill's OpenCode command. Both ask first.
 
 ## 0. Find the bundle and the project
 
@@ -49,14 +47,20 @@ S. **Bring the skill itself up to date first.** Skip this step if `$SRC/.git` do
    - Relay's entries are `docs/STATUS.md` and `docs/{process,templates,specs,tickets,decisions,research}/`. If one of those folders holds files relay did not create (say, a docs site's own `specs/`), list them and ask before moving that folder.
    - Tell the user what moves and what stays in `docs/`, and ask once. If the arguments said `update all`, take that as yes and report the move in the final reply. On yes, `git mv` each entry to the same name under `relay/`. Git drops `docs/` if nothing else was in it.
    - Rewrite the paths that moved, and only those, in every file under `relay/`, in `.claude/skills/pickup/SKILL.md`, `.claude/skills/wrap/SKILL.md`, `scripts/status.sh` and `AGENTS.md`. Other `docs/` paths may point at the project's own docs, so leave them alone: `sed -i -E 's#(^|[^-./A-Za-z0-9_])docs/(STATUS\.md|process|templates|specs|tickets|decisions|research)\b#\1relay/\2#g' <files>`. Then replace the `AGENTS.md` pointer block with the template's.
-   - Run `bash scripts/status.sh`. It should only rewrite the footer line. Commit the move by itself, staging `relay/`, the removed `docs/` paths and the edited files explicitly, with the message `relay: move from docs/ to relay/`. Then go on to step 1, which now compares only real template changes.
+   - Run `bash scripts/status.sh`. It should only rewrite the footer line. Commit the move by itself, staging `relay/`, the removed `docs/` paths and the edited files explicitly, with the message `relay: move from docs/ to relay/`. Then go on to step C, and step 1 will compare only real template changes.
+C. **OpenCode command.** OpenCode 1 lists skills only under its `/skills` menu, so `/relay-init` there comes from a command file installed next to OpenCode's config, outside the project. Skip this step if `$SRC/opencode-command.sh` does not exist. Otherwise run `bash "$SRC/opencode-command.sh" --check`. It writes nothing and prints one word:
+   - `current`: nothing to do.
+   - `stale`: the installed command is an older copy from this skill. Ask once whether to refresh it. If the arguments said `update all`, take that as yes. On yes, run `bash "$SRC/opencode-command.sh"`.
+   - `missing`: if `~/.config/opencode` exists (the user has OpenCode), say in one line that `bash "$SRC/opencode-command.sh"` adds `/relay-init` to OpenCode. Do not install it unasked.
+   - `conflict`: the user has their own `relay-init` command file. Say so and leave it alone.
+   - In the final reply, report what happened. After a refresh, tell the user to fully quit and restart OpenCode.
 1. **Compare.** Relay-owned files are everything under `$SRC/template/` except `AGENTS.md`, `CLAUDE.md`, `relay/STATUS.md` and `.gitkeep` files. A bundle file named `X.tmpl` corresponds to the project's `X`: the suffix only hides the template's skills from OpenCode's skill scan. Check each one against the project's copy:
    - missing in the project: **new**
    - different: **changed**. Run `diff -u <project file> <template file>`.
    - identical: skip
    Project-owned files (`AGENTS.md` project lines, `STATUS.md`, tickets, specs, decisions, research) are never replaced.
 2. **AGENTS.md pointer block.** If the pointer block in the project's `AGENTS.md` differs from the template's, or is missing, treat the block (only the block) as one more changed item.
-3. **Nothing to do?** Say the project is up to date, with the skill result from step S, and stop. No commit.
+3. **Nothing to do?** Say the project is up to date, with the results from steps S and C, and stop. No commit.
 4. **Present** the new and changed items, one line each, with a plain summary of what changes. A difference may be a deliberate local edit (projects may drift), so say when a diff looks like a project-specific customisation rather than an older template.
 5. **Apply** what the user approves: copy the template file over the project file, add missing `.gitattributes` lines, or swap the pointer block. If the arguments said `update all`, apply everything except items that look like local customisations, and list those as skipped. If `scripts/status.sh` changed, run it afterwards.
-6. **Commit** the applied files explicitly. Message: `relay: update from template`. Do not push. Reply with the skill result from step S, then what was applied and what was skipped.
+6. **Commit** the applied files explicitly. Message: `relay: update from template`. Do not push. Reply with the results from steps S and C, then what was applied and what was skipped.
