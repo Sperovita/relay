@@ -52,6 +52,14 @@ It copies the relay files in, merges an existing `AGENTS.md` / `CLAUDE.md` / `.g
 
 `/relay-init update` compares the project's relay files with this bundle, shows what changed, and applies what you approve. `/relay-init update all` applies everything except files that look locally customised. An install from before relay moved to its own folder (relay files under `docs/`) is moved to `relay/` first.
 
+Projects that block access outside themselves still work. The skill never reads its own folder. It only runs three commands on it, always with the full path written out, so you can allow them without opening anything else. In Claude Code, with your home folder's absolute path in place of `<home>`:
+
+```
+Bash(<home>/.claude/skills/relay-init/init.sh:*)
+Bash(<home>/.claude/skills/relay-init/opencode-command.sh:*)
+Bash(git -C <home>/.claude/skills/relay-init:*)
+```
+
 The skill is manual-only (`disable-model-invocation`), so Claude Code never runs it unless you type it. OpenCode ignores that flag, but the skill's description says it runs by hand only, and the command is how you start it there.
 
 ## OpenCode
