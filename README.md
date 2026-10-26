@@ -64,7 +64,7 @@ The skill is manual-only (`disable-model-invocation`), so Claude Code never runs
 ## What's here
 
 - `SKILL.md`  the `/relay-init` skill
-- `init.sh`  the mechanical copier the skill calls. Never overwrites. You can also run it by hand: `bash init.sh /path/to/project`
+- `init.sh`  the mechanical copier the skill calls. Never overwrites. You can also run it by hand: `bash init.sh /path/to/project`. `--diff`, `--apply` and `--show` compare a project with the template, copy named files over, and print a template file. The skill gets everything it needs from the bundle this way, so it works in projects that block reads outside themselves.
 - `opencode/relay-init.md`, `opencode-command.sh`  the OpenCode `/relay-init` command and its installer. `bash opencode-command.sh --check` reports `current`, `missing`, `stale` or `conflict` without writing.
 - `template/`  the files a project gets
 
