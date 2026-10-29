@@ -17,6 +17,8 @@ scripts/status.sh  lints ticket frontmatter, then rebuilds STATUS.md
 scripts/new-id.sh  prints a fresh ticket or decision id
 ```
 
+On the board, **Waiting** holds `ready` tickets whose `blocked-by` names a ticket that is not `done`; they move to Ready on their own once it is. **Blocked** holds tickets someone set to `blocked`.
+
 ## Naming
 
 - Tickets and decisions: `<id>-verb-phrase.md`, lowercase, dashes. Mint the id with `scripts/new-id.sh`: today's date plus three random characters, `2026-10-25-k7q`. Never count up from the highest existing number; two clones counting up mint the same one. If the script cannot run, use today's date plus three random lowercase letters or digits that no other ticket or decision uses as its suffix.
@@ -33,6 +35,10 @@ scripts/new-id.sh  prints a fresh ticket or decision id
 - Several tiny bugs can share one `fix` ticket. Nothing else should be batched.
 - A contract (schema, API, migration, file format, wire shape) lives inside exactly one ticket. Split by layer or by feature, never across a contract: two tickets that each own half of an interface can both finish, both pass their own tests, and not work together.
 - Research goes to a subagent (Opus or below) that writes into `relay/research/` and returns a short summary. The file is the deliverable.
+
+## From a spec to tickets
+
+A spec usually breaks into 3 to 7 tickets. Split where the work separates cleanly: by phase, by layer, or by feature, with any order written as `blocked-by`. Do not split exploratory work before the exploring is done, or tightly coupled work whose halves only make sense together; one ticket, re-typed as it goes, is better. Each ticket must stand on its own for a cold session, with its spec in `spec:` and its own Goal and Acceptance, not "see the spec". When in doubt, don't split; a ticket that turns out too big can still be split at wrap.
 
 ## Decision records
 
@@ -56,9 +62,11 @@ Write one when a choice constrains future work and someone would otherwise re-li
 ## Context budget
 
 - Wrap before any break longer than an hour. Resuming from files is cheap; a cold cache on a large context is not.
+- Wrap as soon as the context or usage budget looks nearly spent, without waiting to be asked. A session cut off before wrap leaves only its commits.
 - Keep `AGENTS.md` to pointers plus a few project specifics. It loads into every session.
 
 ## Verbs
 
-- `wrap` ends a leg. `pickup <id>` starts one on a named ticket. `catch me up` shows the board and asks.
+- `wrap` ends a leg. `pickup <id>` starts one on a named ticket. `pickup next` starts the first ticket under Ready without asking. `catch me up` shows the board and asks.
+- Ready is ordered by id, so `pickup next` takes the oldest startable ticket. When that is the wrong one, name the ticket instead.
 - Named to avoid Claude Code built-ins: `/resume` picks a past session there, and `--continue` reopens the last one.

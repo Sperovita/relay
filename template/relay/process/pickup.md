@@ -1,10 +1,12 @@
 # Pickup
 
-Run this at the start of every session, or when the user says "pick up <id>" or "catch me up". It costs one small file read plus one ticket.
+Run this at the start of every session, or when the user says "pick up <id>", "pickup next" or "catch me up". It costs one small file read plus one ticket.
 
 1. Read `relay/STATUS.md`.
-2. **If the user's first message names a ticket or describes new work**, go straight there. Do not list the board, do not ask.
-   - Named ticket: open `relay/tickets/<id>-*.md`, or `relay/tickets/????-??-??-<suffix>-*.md` when the user gave only the three-character suffix. Read its Handoff block, continue from "Next command". The handoff is enough to continue. When it lacks a detail you need, `git log --grep <id>` lists every claim, work and wrap commit for the ticket; the commits are the raw record, read the diff of the one that matters.
+2. **If the user's first message names a ticket, says `pickup next`, or describes new work**, go straight there. Do not list the board, do not ask.
+   - Named ticket: open `relay/tickets/<id>-*.md`, or `relay/tickets/????-??-??-<suffix>-*.md` when the user gave only the three-character suffix. Read its Handoff block, continue from "Next command". The handoff is enough to continue. When it lacks a detail you need, `git log --grep <id>` lists every claim, work and wrap commit for the ticket; the commits are the raw record, read the diff of the one that matters. If that log shows work commits newer than the last `wrap:` commit, the previous session ended without wrapping and the handoff is older than its work; read those commits before trusting "Next command".
+   - `pickup next`: take the first ticket under Ready on the board and treat it as named. Ready holds only startable tickets; Waiting and Blocked are skipped. If Ready is empty, fall through to step 3.
+   - Inputs, for a named or next ticket: if its `blocked-by` names tickets that are now `done`, read the `Done:` line of each one's Handoff; if it names a spec, read the spec's Constraints and Decisions so far. Read nothing further up front; every extra file is a cost each pickup pays.
    - New work: create a ticket from `relay/templates/ticket.md` (id from `scripts/new-id.sh`, see conventions). If it belongs to an existing spec, add it to that spec's ticket list.
    - Quick question or five-minute task: skip claiming. Say so in one line and proceed. Wrap still applies if anything gets decided.
 3. **Otherwise** reply with the in-flight and ready tickets, one line each, and ask which one. Stop and wait.

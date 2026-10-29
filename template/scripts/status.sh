@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Rebuild relay/STATUS.md from the frontmatter of relay/tickets/*.md.
 # Lints the tickets first and refuses to write if one is broken: duplicate id, unknown status,
-# missing id, title or type, filename not starting with the id. Keeps the hand-edited "Summary:" line. Safe to run any time.
+# missing id, title or type, filename not starting with the id. A ready ticket whose blocked-by names a ticket
+# that is not done goes under Waiting, not Ready. Keeps the hand-edited "Summary:" line. Safe to run any time.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -60,15 +61,41 @@ lint() {
     ok=false
   done
   $ok || { echo "status.sh: not writing $status_file; fix the files above" >&2; exit 1; }
+  # a blocked-by id that matches no ticket only warns; waiting() counts it as open
+  local known; known=$(printf '%s' "$ids" | cut -f1)
+  for f in $(tickets); do
+    for d in $(field "$f" blocked-by | tr ',' ' '); do
+      grep -qxF -- "$d" <<<"$known" || echo "status.sh: $f: blocked-by '$d' matches no ticket; counted as open" >&2
+    done
+  done
+  return 0
 }
 
-section() { # section STATUS HEADING [LIMIT]
-  local want=$1 heading=$2 limit=${3:-0} out="" f n=0
+# index: one "id<TAB>status" line per ticket, built once after lint
+index=""
+build_index() { local f; for f in $(tickets); do index+="$(field "$f" id)"$'\t'"$(field "$f" status)"$'\n'; done; }
+
+# waiting FILE -> true when a blocked-by id names a ticket that is not done, or no ticket at all
+waiting() {
+  local b
+  for b in $(field "$1" blocked-by | tr ',' ' '); do
+    [ "$(awk -F'\t' -v b="$b" '$1 == b { print $2 }' <<<"$index")" = done ] || return 0
+  done
+  return 1
+}
+
+section() { # section STATUS HEADING [LIMIT]; "ready" excludes waiting tickets, "waiting" is ready ones with an open blocker
+  local want=$1 heading=$2 limit=${3:-0} out="" f n=0 st
   local list; list=$(tickets)
   [ "$limit" -gt 0 ] && list=$(printf '%s\n' "$list" | sort -r)
   for f in $list; do
     [ -n "$f" ] || continue
-    [ "$(field "$f" status)" = "$want" ] || continue
+    st=$(field "$f" status)
+    case "$want" in
+      ready)   [ "$st" = ready ] && ! waiting "$f" || continue ;;
+      waiting) [ "$st" = ready ] && waiting "$f" || continue ;;
+      *)       [ "$st" = "$want" ] || continue ;;
+    esac
     out+="$(row "$f")"$'\n'
     n=$((n+1)); [ "$limit" -gt 0 ] && [ "$n" -ge "$limit" ] && break
   done
@@ -97,6 +124,7 @@ specs() { # specs HEADING WANT_DONE(true|false)
 }
 
 lint
+build_index
 
 {
   echo "# Status"
@@ -107,6 +135,7 @@ lint
   section in-progress "In flight"
   section blocked "Blocked"
   section ready "Ready"
+  section waiting "Waiting"
   section done "Recently done" 5
   specs "Specs" false
   specs "Specs done" true

@@ -1,10 +1,10 @@
 # Wrap
 
-Run this when the user says wrap, at a natural stopping point, or before any break longer than an hour. Everything here is written for a reader with zero context: concrete repo-relative paths, forward slashes, the reasoning behind choices.
+Run this when the user says wrap, at a natural stopping point, before any break longer than an hour, or as soon as the context or usage budget looks nearly spent. A session cut off before wrap leaves only its commits, so wrap early rather than late. Everything here is written for a reader with zero context: concrete repo-relative paths, forward slashes, the reasoning behind choices.
 
 1. **Identify the claimed ticket.** If this was an unclaimed quick task, skip to step 4.
 2. **Overwrite the ticket's Handoff block.** Replace the previous contents entirely:
-   - Done: what now works, with the files that changed.
+   - Done: what now works, with the files that changed, and how you know: the tests run and their result, or what was tried by hand. "Should work" is not evidence; if nothing was checked, say so.
    - Left: what remains, in the order to do it.
    - Decisions (and why): anything a future session would otherwise re-debate.
    - Gotchas / dead ends: what was tried and failed, so nobody tries it again.

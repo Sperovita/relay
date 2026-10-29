@@ -25,7 +25,7 @@ Working notes during the session. Optional. Prune at wrap.
 ## Handoff
 _Overwritten at every wrap. Written for a reader with zero context._
 
-Done:
+Done: (what works, files changed, how it was checked: tests and result, or what was tried by hand)
 Left:
 Decisions (and why):
 Gotchas / dead ends:
